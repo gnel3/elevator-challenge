@@ -2,7 +2,7 @@ using Elevator.Challenge.Domain.Enums;
 
 namespace Elevator.Challenge.Domain.Entities;
 
-public class PassengerElevator(Guid id) : ElevatorBase(id)
+public class PassengerElevator(int id) : ElevatorBase(id)
 {
     public override async Task MoveAsync()
     {

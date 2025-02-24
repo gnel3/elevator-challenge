@@ -2,7 +2,7 @@ using Elevator.Challenge.Domain.Enums;
 
 namespace Elevator.Challenge.Domain.Entities;
 
-public abstract class ElevatorBase(Guid id) : Entity(id)
+public abstract class ElevatorBase(int id) : Entity(id)
 {
     public int CurrentFloor { get; protected set; } = 1;
     public Direction CurrentDirection { get; protected set; } = Direction.Idle;
