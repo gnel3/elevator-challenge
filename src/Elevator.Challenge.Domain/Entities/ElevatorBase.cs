@@ -11,7 +11,7 @@ public abstract class ElevatorBase(int id, int maxPassengers) : Entity(id)
     public int MaxPassengers { get; protected set; } = maxPassengers;
     public List<int> DestinationFloors { get; protected set; } = new();
 
-    public abstract Task MoveAsync();
+    public abstract Task MoveAsync(CancellationToken cancellationToken);
     public abstract bool CanAddPassengers(int count);
     public abstract void AddPassengers(int count);
     public abstract void RemovePassengers(int count);

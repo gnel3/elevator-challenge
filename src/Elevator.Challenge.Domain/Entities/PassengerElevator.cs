@@ -4,24 +4,39 @@ namespace Elevator.Challenge.Domain.Entities;
 
 public class PassengerElevator(int id, int maxPassengers) : ElevatorBase(id, maxPassengers)
 {
-    public override async Task MoveAsync()
+    public override async Task MoveAsync(CancellationToken cancellationToken)
     {
-        if (DestinationFloors.Count == 0)
+        try
         {
-            return;
+            if (DestinationFloors.Count == 0)
+            {
+                return;
+            }
+        
+            Status = Status.Moving;
+            var nextFloor = DestinationFloors[0];
+            CurrentDirection = nextFloor > CurrentFloor ? Direction.Up : Direction.Down;
+        
+            // Simulate movement time
+            await Task.Delay(Math.Abs(nextFloor - CurrentFloor) * 1000, cancellationToken);
+        
+            cancellationToken.ThrowIfCancellationRequested();
+
+            CurrentFloor = nextFloor;
+            DestinationFloors.RemoveAt(0);
+
+            if (DestinationFloors.Count == 0)
+            {
+                Status = Status.Available;
+                CurrentDirection = Direction.Idle;
+            }
         }
-
-        Status = Status.Moving;
-        var nextFloor = DestinationFloors[0];
-        CurrentDirection = nextFloor > CurrentFloor ? Direction.Up : Direction.Down;
-
-        // Simulate movement time
-        await Task.Delay(Math.Abs(nextFloor - CurrentFloor) * 1000);
-
-        CurrentFloor = nextFloor;
-        DestinationFloors.RemoveAt(0);
-
-        if (DestinationFloors.Count == 0)
+        catch (OperationCanceledException)
+        {
+            Status = Status.Available;
+            CurrentDirection = Direction.Idle;
+        }
+        catch (Exception ex)
         {
             Status = Status.Available;
             CurrentDirection = Direction.Idle;

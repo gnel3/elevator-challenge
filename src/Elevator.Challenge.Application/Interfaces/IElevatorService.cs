@@ -6,7 +6,7 @@ namespace Elevator.Challenge.Application.Interfaces;
 public interface IElevatorService
 {
     IReadOnlyList<ElevatorBase> Elevators { get; }
-    Task CallElevatorAsync(ElevatorRequest request);
-    Task UpdateElevatorsAsync();
+    Task<ElevatorResult> CallElevatorAsync(ElevatorRequest request, CancellationToken cancellationToken);
+    Task UpdateElevatorsAsync(CancellationToken cancellationToken);
     ElevatorBase GetNearestElevator(int floor);
 }
