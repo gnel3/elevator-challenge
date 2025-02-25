@@ -1,4 +1,5 @@
 using Elevator.Challenge.Application.Interfaces;
+using Elevator.Challenge.Application.Models;
 using Elevator.Challenge.Application.Settings;
 using Elevator.Challenge.Domain.Entities;
 using Elevator.Challenge.Domain.Enums;
@@ -18,21 +19,21 @@ public class ElevatorService : IElevatorService
             .ToList();
     }
 
-    public async Task CallElevatorAsync(int fromFloor, int toFloor, int passengers)
+    public async Task CallElevatorAsync(ElevatorRequest request)
     {
-        var elevator = GetNearestElevator(fromFloor);
+        var elevator = GetNearestElevator(request.FromFloor);
         
-        if (!elevator.CanAddPassengers(passengers))
+        if (!elevator.CanAddPassengers(request.Passengers))
             throw new InvalidOperationException("Too many passengers for a single elevator");
 
-        elevator.AddDestination(fromFloor);
+        elevator.AddDestination(request.FromFloor);
         await elevator.MoveAsync();
         
-        elevator.AddPassengers(passengers);
-        elevator.AddDestination(toFloor);
+        elevator.AddPassengers(request.Passengers);
+        elevator.AddDestination(request.ToFloor);
         await elevator.MoveAsync();
         
-        elevator.RemovePassengers(passengers);
+        elevator.RemovePassengers(request.Passengers);
     }
 
     public async Task UpdateElevatorsAsync()
