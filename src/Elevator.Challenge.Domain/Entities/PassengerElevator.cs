@@ -2,7 +2,7 @@ using Elevator.Challenge.Domain.Enums;
 
 namespace Elevator.Challenge.Domain.Entities;
 
-public class PassengerElevator(int id) : ElevatorBase(id)
+public class PassengerElevator(int id, int maxPassengers) : ElevatorBase(id, maxPassengers)
 {
     public override async Task MoveAsync()
     {
@@ -36,7 +36,9 @@ public class PassengerElevator(int id) : ElevatorBase(id)
     public override void AddPassengers(int count)
     {
         if (!CanAddPassengers(count))
+        {
             throw new InvalidOperationException("Elevator capacity exceeded");
+        }
 
         CurrentPassengers += count;
     }
@@ -44,14 +46,19 @@ public class PassengerElevator(int id) : ElevatorBase(id)
     public override void RemovePassengers(int count)
     {
         if (CurrentPassengers - count < 0)
+        {
             throw new InvalidOperationException("Cannot remove more passengers than present");
+        }
 
         CurrentPassengers -= count;
     }
 
     public override void AddDestination(int floor)
     {
-        if (DestinationFloors.Contains(floor)) return;
+        if (DestinationFloors.Contains(floor))
+        {
+            return;
+        }
         
         DestinationFloors.Add(floor);
         DestinationFloors.Sort();

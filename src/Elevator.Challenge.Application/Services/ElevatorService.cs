@@ -1,4 +1,5 @@
 using Elevator.Challenge.Application.Interfaces;
+using Elevator.Challenge.Application.Settings;
 using Elevator.Challenge.Domain.Entities;
 using Elevator.Challenge.Domain.Enums;
 
@@ -9,10 +10,10 @@ public class ElevatorService : IElevatorService
     private readonly List<ElevatorBase> _elevators;
     public IReadOnlyList<ElevatorBase> Elevators => _elevators.AsReadOnly();
 
-    public ElevatorService(int numberOfElevators)
+    public ElevatorService(ElevatorSettings settings)
     {
-        _elevators = Enumerable.Range(1, numberOfElevators)
-            .Select(id => new PassengerElevator(id))
+        _elevators = Enumerable.Range(1, settings.NumberOfElevators)
+            .Select(id => new PassengerElevator(id, settings.MaxPassengers))
             .Cast<ElevatorBase>()
             .ToList();
     }
