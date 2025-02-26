@@ -4,7 +4,7 @@ namespace Elevator.Challenge.Domain.Entities;
 
 public class PassengerElevator(int id, int maxPassengers) : ElevatorBase(id, maxPassengers)
 {
-    public override async Task MoveAsync(CancellationToken cancellationToken)
+    public override async Task MoveAsync(bool simulateMovement, CancellationToken cancellationToken)
     {
         try
         {
@@ -16,9 +16,11 @@ public class PassengerElevator(int id, int maxPassengers) : ElevatorBase(id, max
             Status = Status.Moving;
             var nextFloor = DestinationFloors[0];
             CurrentDirection = nextFloor > CurrentFloor ? Direction.Up : Direction.Down;
-        
-            // Simulate movement time
-            await Task.Delay(Math.Abs(nextFloor - CurrentFloor) * 1000, cancellationToken);
+
+            if (simulateMovement)
+            {
+                await Task.Delay(Math.Abs(nextFloor - CurrentFloor) * 1000, cancellationToken);
+            }
         
             cancellationToken.ThrowIfCancellationRequested();
 

@@ -22,7 +22,8 @@ public class ElevatorServiceTests
         {
             NumberOfElevators = 2,
             MaxPassengers = 10,
-            NumberOfFloors = 10
+            NumberOfFloors = 10,
+            SimulateMovement = false //SimulateMovement = false for testing
         });
 
         _elevatorService = new ElevatorService(_mockSettings.Object);
@@ -124,7 +125,7 @@ public class ElevatorServiceTests
         var cancellationToken = CancellationToken.None;
 
         // Act
-        await elevator.MoveAsync(cancellationToken);
+        await elevator.MoveAsync(false, cancellationToken); //SimulateMovement = false for testing
 
         // Assert
         Assert.Multiple(() =>
@@ -133,7 +134,7 @@ public class ElevatorServiceTests
             Assert.That(elevator.Status, Is.EqualTo(Status.Moving));
         });
 
-        await elevator.MoveAsync(cancellationToken);
+        await elevator.MoveAsync(false, cancellationToken); //SimulateMovement = false for testing
 
         // Assert
         Assert.Multiple(() =>
