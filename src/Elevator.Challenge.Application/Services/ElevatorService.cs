@@ -5,6 +5,7 @@ using Elevator.Challenge.Domain.Entities;
 using Elevator.Challenge.Domain.Enums;
 using Elevator.Challenge.Domain.Errors;
 using Elevator.Challenge.Domain.Shared;
+using Microsoft.Extensions.Options;
 
 namespace Elevator.Challenge.Application.Services;
 
@@ -15,12 +16,13 @@ public class ElevatorService : IElevatorService
     
     public IReadOnlyList<ElevatorBase> Elevators => _elevators.AsReadOnly();
 
-    public ElevatorService(ElevatorSettings settings)
+    public ElevatorService(IOptions<ElevatorSettings> settings)
     {
-        _settings = settings;
+        // Get the actual settings value from the IOptions
+        _settings = settings.Value;
 
-        _elevators = Enumerable.Range(1, settings.NumberOfElevators)
-            .Select(id => new PassengerElevator(id, settings.MaxPassengers))
+        _elevators = Enumerable.Range(1, _settings.NumberOfElevators)
+            .Select(id => new PassengerElevator(id, _settings.MaxPassengers))
             .Cast<ElevatorBase>()
             .ToList();
     }
