@@ -34,9 +34,9 @@ while (!cancellationTokenSource.Token.IsCancellationRequested)
             var elevatorResult =
                 await elevatorService.CallElevatorAsync(elevatorRequest, cancellationTokenSource.Token);
             
-            if (!elevatorResult.IsSuccess)
+            if (elevatorResult.IsFailure)
             {
-                Console.WriteLine(elevatorResult.ErrorMessage);
+                Console.WriteLine(elevatorResult.Error.Message);
             }
 
             return elevatorResult;
@@ -69,7 +69,7 @@ while (!cancellationTokenSource.Token.IsCancellationRequested)
         }
         else
         {
-            ShowMessage(result.ErrorMessage, ConsoleColor.Red);
+            ShowMessage(result.Error.Message, ConsoleColor.Red);
         }
     }
     catch (Exception ex)

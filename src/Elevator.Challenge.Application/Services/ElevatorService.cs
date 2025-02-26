@@ -3,6 +3,8 @@ using Elevator.Challenge.Application.Models;
 using Elevator.Challenge.Application.Settings;
 using Elevator.Challenge.Domain.Entities;
 using Elevator.Challenge.Domain.Enums;
+using Elevator.Challenge.Domain.Errors;
+using Elevator.Challenge.Domain.Shared;
 
 namespace Elevator.Challenge.Application.Services;
 
@@ -23,19 +25,19 @@ public class ElevatorService : IElevatorService
             .ToList();
     }
 
-    public async Task<ElevatorResult> CallElevatorAsync(ElevatorRequest request, CancellationToken cancellationToken)
+    public async Task<Result> CallElevatorAsync(ElevatorRequest request, CancellationToken cancellationToken)
     {
         try
         {
             if (request.FromFloor < 1 || request.FromFloor > _settings.NumberOfFloors ||
                 request.ToFloor < 1 || request.ToFloor > _settings.NumberOfFloors)
             {
-                return ElevatorResult.Failure($"Floor numbers must be between 1 and {_settings.NumberOfFloors}");
+                return Result.Failure(DomainErrors.Elevator.CheckFloor);
             }
 
             if (request.Passengers < 1)
             {
-                return ElevatorResult.Failure($"At least one passenger is required");
+                return Result.Failure(DomainErrors.Elevator.CheckPassengers);
             }
             
             var remainingPassengers = request.Passengers;
@@ -60,11 +62,11 @@ public class ElevatorService : IElevatorService
                 await Task.WhenAll(callElevatorTasks);
             }
 
-            return ElevatorResult.Success();
+            return Result.Success();
         }
         catch (Exception ex)
         {
-            return ElevatorResult.Failure(ex.Message);
+            return Result.Failure(new Error("Elevator.CallElevator", ex.Message));
         }
     }
 

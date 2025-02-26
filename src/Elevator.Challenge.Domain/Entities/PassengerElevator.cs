@@ -36,7 +36,7 @@ public class PassengerElevator(int id, int maxPassengers) : ElevatorBase(id, max
             Status = Status.Available;
             CurrentDirection = Direction.Idle;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             Status = Status.Available;
             CurrentDirection = Direction.Idle;
