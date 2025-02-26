@@ -13,6 +13,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elevator.Challenge.Infrastr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elevator.Challenge.Presentation", "src\Elevator.Challenge.Presentation\Elevator.Challenge.Presentation.csproj", "{DC00C0D2-9969-4BDA-994B-63D7F1AC9BE4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{56FC1068-BD7F-4DA5-B613-F5041CD8A07B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elevator.Challenge.UnitTests", "tests\Elevator.Challenge.UnitTests\Elevator.Challenge.UnitTests.csproj", "{3E918175-8418-4C00-8064-FED9214AC971}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elevator.Challenge.IntegrationTests", "tests\Elevator.Challenge.IntegrationTests\Elevator.Challenge.IntegrationTests.csproj", "{B7517722-D47E-43A1-83C3-74857D37AC9C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +32,8 @@ Global
 		{E97D033A-ADC3-4559-B826-420597B22529} = {CED98108-AB18-43A7-9F31-797B4D5B101E}
 		{D437A657-FDAB-4FEC-98C8-58FE8F63DCBD} = {CED98108-AB18-43A7-9F31-797B4D5B101E}
 		{DC00C0D2-9969-4BDA-994B-63D7F1AC9BE4} = {CED98108-AB18-43A7-9F31-797B4D5B101E}
+		{3E918175-8418-4C00-8064-FED9214AC971} = {56FC1068-BD7F-4DA5-B613-F5041CD8A07B}
+		{B7517722-D47E-43A1-83C3-74857D37AC9C} = {56FC1068-BD7F-4DA5-B613-F5041CD8A07B}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C6C2995A-1F37-4D4E-99CA-D3D8D4174847}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -44,5 +52,13 @@ Global
 		{DC00C0D2-9969-4BDA-994B-63D7F1AC9BE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC00C0D2-9969-4BDA-994B-63D7F1AC9BE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC00C0D2-9969-4BDA-994B-63D7F1AC9BE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E918175-8418-4C00-8064-FED9214AC971}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E918175-8418-4C00-8064-FED9214AC971}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E918175-8418-4C00-8064-FED9214AC971}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E918175-8418-4C00-8064-FED9214AC971}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7517722-D47E-43A1-83C3-74857D37AC9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7517722-D47E-43A1-83C3-74857D37AC9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7517722-D47E-43A1-83C3-74857D37AC9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7517722-D47E-43A1-83C3-74857D37AC9C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
