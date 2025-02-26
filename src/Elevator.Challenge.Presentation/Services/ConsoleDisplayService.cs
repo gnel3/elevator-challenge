@@ -18,7 +18,7 @@ public static class ConsoleDisplayService
     public static void ShowStatus(IEnumerable<ElevatorBase> elevators)
     {
         Console.Clear();
-        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("=== Elevator Status ===");
         foreach (var elevator in elevators)
         {
@@ -35,7 +35,15 @@ public static class ConsoleDisplayService
             };
             Console.WriteLine($"Status: {elevator.Status}");
             Console.ResetColor();
+            Console.ForegroundColor = elevator.CurrentDirection switch
+            {
+                Direction.Down => ConsoleColor.Cyan,
+                Direction.Up => ConsoleColor.Cyan,
+                Direction.Idle => ConsoleColor.White,
+                _ => ConsoleColor.Red
+            };
             Console.WriteLine($"Direction: {elevator.CurrentDirection}");
+            Console.ResetColor();
             Console.WriteLine($"Passengers: {elevator.CurrentPassengers}/{elevator.MaxPassengers}");
             Console.WriteLine($"Destinations: {string.Join(", ", elevator.DestinationFloors)}");
             Console.WriteLine("===========================");
