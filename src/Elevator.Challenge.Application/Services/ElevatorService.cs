@@ -76,7 +76,7 @@ public class ElevatorService : IElevatorService
     {
         var tasks = _elevators
             .Where(e => e.Status == Status.Moving)
-            .Select(e => e.MoveAsync(cancellationToken));
+            .Select(e => e.MoveAsync(_settings.SimulateMovement, cancellationToken));
 
         await Task.WhenAll(tasks);
     }
@@ -93,10 +93,10 @@ public class ElevatorService : IElevatorService
     {
         var elevator = GetNearestElevator(request.FromFloor);
         elevator.AddDestination(request.FromFloor);
-        await elevator.MoveAsync(cancellationToken);
+        await elevator.MoveAsync(_settings.SimulateMovement,cancellationToken);
         elevator.AddPassengers(request.Passengers);
         elevator.AddDestination(request.ToFloor);
-        await elevator.MoveAsync(cancellationToken);
+        await elevator.MoveAsync(_settings.SimulateMovement,cancellationToken);
         elevator.RemovePassengers(request.Passengers);
     }
 }
