@@ -24,6 +24,7 @@ public class ProgramTests
         
         _serviceProvider = new ServiceCollection()
             .AddApplication(configuration)
+            .AddLogging()
             .BuildServiceProvider();
     }
     
@@ -39,14 +40,14 @@ public class ProgramTests
     [Test]
     public void ShouldResolveElevatorService()
     {
-        var elevatorService = _serviceProvider.GetService<IElevatorService>();
+        var elevatorService = _serviceProvider.GetRequiredService<IElevatorService>();
         Assert.That(elevatorService, Is.Not.Null);
     }
 
     [Test]
     public async Task ShouldHandleElevatorRequest()
     {
-        var elevatorService = _serviceProvider.GetService<IElevatorService>();
+        var elevatorService = _serviceProvider.GetRequiredService<IElevatorService>();
         var request = new ElevatorRequest(1, 5, 5);
         var result = await elevatorService.CallElevatorAsync(request, CancellationToken.None);
 

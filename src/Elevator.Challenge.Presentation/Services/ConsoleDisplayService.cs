@@ -6,7 +6,12 @@ namespace Elevator.Challenge.Presentation.Services;
 
 public static class ConsoleDisplayService
 {
-    public static void ShowMessage(string message, ConsoleColor consoleColor)
+    /// <summary>
+    /// Displays a message in the specified console color.
+    /// </summary>
+    /// <param name="message">The message to display.</param>
+    /// <param name="consoleColor">The color to use for the message.</param>
+    public static void DisplayMessage(string message, ConsoleColor consoleColor)
     {
         Console.ForegroundColor = consoleColor;
         Console.WriteLine();
@@ -15,7 +20,11 @@ public static class ConsoleDisplayService
         Console.ResetColor();
     }
 
-    public static void ShowStatus(IEnumerable<ElevatorBase> elevators)
+    /// <summary>
+    /// Displays the status of all elevators.
+    /// </summary>
+    /// <param name="elevators">The list of elevators to display the status for.</param>
+    public static void DisplayStatus(IEnumerable<ElevatorBase> elevators)
     {
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.White;
@@ -50,7 +59,11 @@ public static class ConsoleDisplayService
         }
     }
 
-    public static ElevatorRequest GetRequest()
+    /// <summary>
+    /// Gets an elevator request from user input.
+    /// </summary>
+    /// <returns>An ElevatorRequest object containing the user's input.</returns>
+    public static ElevatorRequest GetElevatorRequestFromUserInput()
     {
         Console.Write("Enter the floor number where the elevator is called from: ");
 

@@ -3,6 +3,7 @@ using Elevator.Challenge.Application.Services;
 using Elevator.Challenge.Application.Settings;
 using Elevator.Challenge.Domain.Enums;
 using Elevator.Challenge.Domain.Errors;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
@@ -26,7 +27,7 @@ public class ElevatorServiceTests
             SimulateMovement = false //SimulateMovement = false for testing
         });
 
-        _elevatorService = new ElevatorService(_mockSettings.Object);
+        _elevatorService = new ElevatorService(_mockSettings.Object, Mock.Of<ILogger<ElevatorService>>());
     }
     
     [Test]

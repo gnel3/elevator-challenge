@@ -8,20 +8,23 @@ IElevatorService elevatorService;
 
 try
 {
-    var configuration = new ConfigurationBuilder()
+    var configurationRoot = new ConfigurationBuilder()
         .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
         .AddJsonFile("appsettings.json", optional: false)
         .Build();
 
+    // Set up dependency injection
     var serviceProvider = new ServiceCollection()
-        .AddApplication(configuration)
+        .AddApplication(configurationRoot)
+        .AddLogging()
         .BuildServiceProvider();
 
+    // Get the elevator service from the service provider
     elevatorService = serviceProvider.GetRequiredService<IElevatorService>();
 }
 catch (Exception ex)
 {
-    ConsoleDisplayService.ShowMessage(ex.Message, ConsoleColor.Red);
+    ConsoleDisplayService.DisplayMessage(ex.Message, ConsoleColor.Red);
     return;
 }
 
@@ -31,21 +34,24 @@ Console.WriteLine("Welcome to the Elevator Simulation System");
 Console.WriteLine("Press Ctrl+C to exit");
 Console.WriteLine();
 
+// Create a cancellation token source to handle graceful shutdowns
 using var cancellationTokenSource = new CancellationTokenSource();
 
-Console.CancelKeyPress += (sender, e) =>
+// Handle Ctrl+C to cancel the simulation
+Console.CancelKeyPress += (_, e) =>
 {
     e.Cancel = true;
     cancellationTokenSource.Cancel();
 };
 
-ConsoleDisplayService.ShowStatus(elevatorService.Elevators);
+// Display initial status of elevators
+ConsoleDisplayService.DisplayStatus(elevatorService.Elevators);
 
 while (!cancellationTokenSource.Token.IsCancellationRequested)
 {
     try
     {
-        var elevatorRequest = ConsoleDisplayService.GetRequest();
+        var elevatorRequest = ConsoleDisplayService.GetElevatorRequestFromUserInput();
 
         var callElevatorTask = Task.Run(async () =>
         {
@@ -64,8 +70,8 @@ while (!cancellationTokenSource.Token.IsCancellationRequested)
         {
             while (!callElevatorTask.IsCompleted)
             {
-                ConsoleDisplayService.ShowStatus(elevatorService.Elevators);
-                await Task.Delay(1000);
+                ConsoleDisplayService.DisplayStatus(elevatorService.Elevators);
+                await Task.Delay(500);
             }
         }, cancellationTokenSource.Token);
 
@@ -74,8 +80,8 @@ while (!cancellationTokenSource.Token.IsCancellationRequested)
         var result = await callElevatorTask;
         if (result.IsSuccess)
         {
-            ConsoleDisplayService.ShowStatus(elevatorService.Elevators);
-            ConsoleDisplayService.ShowMessage("Press 'Q' to quit or any other key to make another request.", ConsoleColor.Yellow);
+            ConsoleDisplayService.DisplayStatus(elevatorService.Elevators);
+            ConsoleDisplayService.DisplayMessage("Press 'Q' to quit or any other key to make another request.", ConsoleColor.Yellow);
 
             if (Console.ReadKey().Key == ConsoleKey.Q)
             {
@@ -85,11 +91,11 @@ while (!cancellationTokenSource.Token.IsCancellationRequested)
         }
         else
         {
-            ConsoleDisplayService.ShowMessage(result.Error.Message, ConsoleColor.Red);
+            ConsoleDisplayService.DisplayMessage(result.Error.Message, ConsoleColor.Red);
         }
     }
     catch (Exception ex)
     {
-        ConsoleDisplayService.ShowMessage(ex.Message, ConsoleColor.Red);
+        ConsoleDisplayService.DisplayMessage(ex.Message, ConsoleColor.Red);
     }
 }

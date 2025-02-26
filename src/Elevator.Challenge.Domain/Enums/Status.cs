@@ -4,6 +4,5 @@ public enum Status
 {
     Available,
     Moving,
-    Stopped,
-    OutOfService
+    Stopped
 }
