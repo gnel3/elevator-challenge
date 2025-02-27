@@ -1,40 +1,79 @@
 using Elevator.Challenge.Application.Models;
 using Elevator.Challenge.Domain.Entities;
 using Elevator.Challenge.Domain.Enums;
+using Elevator.Challenge.Presentation.Extensions;
 
 namespace Elevator.Challenge.Presentation.Services;
 
 public static class ConsoleDisplayService
 {
     /// <summary>
+    /// This needs to change to match the number of lines displayed for each elevator status in DisplayStatus.
+    /// </summary>
+    private const int StatusHeightSetting = 7;
+
+    /// <summary>
     /// Displays a message in the specified console color.
     /// </summary>
     /// <param name="message">The message to display.</param>
     /// <param name="consoleColor">The color to use for the message.</param>
-    public static void DisplayMessage(string message, ConsoleColor consoleColor)
+    /// <param name="statusHeight">The height of the status display.</param>
+    public static void DisplayMessage(string message, ConsoleColor consoleColor, int statusHeight = 0)
     {
+        var cursorTop = statusHeight + 1;
+        if (cursorTop >= Console.BufferHeight)
+        {
+            cursorTop = Console.BufferHeight - 1;
+        }
+        
+        Console.SetCursorPosition(0, cursorTop);
         Console.ForegroundColor = consoleColor;
-        Console.WriteLine();
-        Console.WriteLine(message);
-        Console.WriteLine();
+        ConsoleExtensions.WritePadded(message);
         Console.ResetColor();
     }
 
     /// <summary>
-    /// Displays the status of all elevators.
+    /// Calculates the height required to display the status of all elevators.
     /// </summary>
-    /// <param name="elevators">The list of elevators to display the status for.</param>
+    /// <param name="elevatorCount">The number of elevators.</param>
+    /// <returns>The height required to display the status of all elevators.</returns>
+    public static int CalculateStatusHeight(int elevatorCount)
+    {
+        // Start the iteration height at 2 because of the welcome message and status message
+        var statusHeight = 2;
+        
+        // Add the height of the status display for each elevator
+        statusHeight += elevatorCount * StatusHeightSetting;
+        
+        return statusHeight;
+    }
+
+    /// <summary>
+    /// Displays the status of each elevator in the console, including its ID, current floor, status, direction,
+    /// number of passengers, and destination floors.
+    /// </summary>
+    /// <param name="elevators">The collection of elevators to display the status for.</param>
     public static void DisplayStatus(IEnumerable<ElevatorBase> elevators)
     {
-        Console.Clear();
+        Console.SetCursorPosition(0, 0);
+        ConsoleExtensions.WritePadded("Welcome to the Elevator Simulation System");
+        Console.SetCursorPosition(0, 1);
+        ConsoleExtensions.WritePadded("Press Ctrl+C to exit");
+        Console.SetCursorPosition(0, 2);
         Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine("=== Elevator Status ===");
+        ConsoleExtensions.WritePadded("=== Elevator Status ===");
+        
+        // Start the iteration height at 2 because of the welcome message and status message
+        var iterationHeightStart = 2;
+        
         foreach (var elevator in elevators)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"Elevator #{elevator.Id}");
+            Console.SetCursorPosition(0, iterationHeightStart + 1);
+            ConsoleExtensions.WritePadded($"Elevator #{elevator.Id}");
             Console.ResetColor();
-            Console.WriteLine($"Current Floor: {elevator.CurrentFloor}");
+            Console.SetCursorPosition(0, iterationHeightStart + 2);
+            ConsoleExtensions.WritePadded($"Current Floor: {elevator.CurrentFloor}");
             Console.ForegroundColor = elevator.Status switch
             {
                 Status.Available => ConsoleColor.Green,
@@ -42,7 +81,8 @@ public static class ConsoleDisplayService
                 Status.Stopped => ConsoleColor.Yellow,
                 _ => ConsoleColor.Red
             };
-            Console.WriteLine($"Status: {elevator.Status}");
+            Console.SetCursorPosition(0, iterationHeightStart + 3);
+            ConsoleExtensions.WritePadded($"Status: {elevator.Status}");
             Console.ResetColor();
             Console.ForegroundColor = elevator.CurrentDirection switch
             {
@@ -51,56 +91,73 @@ public static class ConsoleDisplayService
                 Direction.Idle => ConsoleColor.White,
                 _ => ConsoleColor.Red
             };
-            Console.WriteLine($"Direction: {elevator.CurrentDirection}");
+            Console.SetCursorPosition(0, iterationHeightStart + 4);
+            ConsoleExtensions.WritePadded($"Direction: {elevator.CurrentDirection}");
             Console.ResetColor();
-            Console.WriteLine($"Passengers: {elevator.CurrentPassengers}/{elevator.MaxPassengers}");
-            Console.WriteLine($"Destinations: {string.Join(", ", elevator.DestinationFloors)}");
-            Console.WriteLine("===========================");
+            Console.SetCursorPosition(0, iterationHeightStart + 5);
+            ConsoleExtensions.WritePadded($"Passengers: {elevator.CurrentPassengers}/{elevator.MaxPassengers}");
+            Console.SetCursorPosition(0, iterationHeightStart + 6);
+            ConsoleExtensions.WritePadded($"Destinations: {string.Join(", ", elevator.DestinationFloors)}");
+            Console.SetCursorPosition(0, iterationHeightStart + 7);
+            ConsoleExtensions.WritePadded("===========================");
+
+            iterationHeightStart += 7;
         }
     }
 
+    
     /// <summary>
     /// Gets an elevator request from user input.
     /// </summary>
+    /// <param name="statusHeight">The height of the status display.</param>
     /// <returns>An ElevatorRequest object containing the user's input.</returns>
-    public static ElevatorRequest GetElevatorRequestFromUserInput()
+    public static ElevatorRequest GetElevatorRequestFromUserInput(int statusHeight)
     {
         int fromFloor;
         while (true)
         {
+            Console.SetCursorPosition(0, statusHeight + 1);
             DisplayRequestMessage("Enter the floor number where the elevator is called ", "from", ": ");
             if (int.TryParse(Console.ReadLine(), out fromFloor))
             {
                 break;
             }
-            Console.WriteLine("Please enter a valid floor number.");
+            ConsoleExtensions.WritePadded("Please enter a valid floor number.");
         }
 
         int toFloor;
         while (true)
         {
+            Console.SetCursorPosition(0, statusHeight + 2);
             DisplayRequestMessage("Enter the floor number where the elevator should go ", "to", ": ");
             if (int.TryParse(Console.ReadLine(), out toFloor))
             {
                 break;
             }
-            Console.WriteLine("Please enter a valid floor number.");
+            ConsoleExtensions.WritePadded("Please enter a valid floor number.");
         }
 
         int passengers;
         while (true)
         {
+            Console.SetCursorPosition(0, statusHeight + 3);
             DisplayRequestMessage("Enter the number of", " passengers ", "on the elevator: ");
             if (int.TryParse(Console.ReadLine(), out passengers))
             {
                 break;
             }
-            Console.WriteLine("Please enter a valid number of passengers.");
+            ConsoleExtensions.WritePadded("Please enter a valid number of passengers.");
         }
 
         return new ElevatorRequest(fromFloor, toFloor, passengers);
     }
     
+    /// <summary>
+    /// Displays a request message with highlighted parts.
+    /// </summary>
+    /// <param name="firstPart">The first part of the message.</param>
+    /// <param name="highlightedPart">The highlighted part of the message.</param>
+    /// <param name="lastPart">The last part of the message.</param>
     private static void DisplayRequestMessage(string firstPart, string highlightedPart, string lastPart)
     {
         Console.Write(firstPart);
