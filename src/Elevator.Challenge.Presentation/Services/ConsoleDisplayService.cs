@@ -65,27 +65,48 @@ public static class ConsoleDisplayService
     /// <returns>An ElevatorRequest object containing the user's input.</returns>
     public static ElevatorRequest GetElevatorRequestFromUserInput()
     {
-        Console.Write("Enter the floor number where the elevator is called from: ");
-
-        if (!int.TryParse(Console.ReadLine(), out var fromFloor))
+        int fromFloor;
+        while (true)
         {
-            Console.WriteLine("Please enter a valid floor number");
+            DisplayRequestMessage("Enter the floor number where the elevator is called ", "from", ": ");
+            if (int.TryParse(Console.ReadLine(), out fromFloor))
+            {
+                break;
+            }
+            Console.WriteLine("Please enter a valid floor number.");
         }
 
-        Console.Write("Enter the floor number where the elevator should go to: ");
-
-        if (!int.TryParse(Console.ReadLine(), out var toFloor))
+        int toFloor;
+        while (true)
         {
-            Console.WriteLine("Please enter a valid floor number");
+            DisplayRequestMessage("Enter the floor number where the elevator should go ", "to", ": ");
+            if (int.TryParse(Console.ReadLine(), out toFloor))
+            {
+                break;
+            }
+            Console.WriteLine("Please enter a valid floor number.");
         }
 
-        Console.Write("Enter the number of passengers on the elevator: ");
-
-        if (!int.TryParse(Console.ReadLine(), out var passengers))
+        int passengers;
+        while (true)
         {
-            Console.WriteLine("Please enter a valid floor number");
+            DisplayRequestMessage("Enter the number of", " passengers ", "on the elevator: ");
+            if (int.TryParse(Console.ReadLine(), out passengers))
+            {
+                break;
+            }
+            Console.WriteLine("Please enter a valid number of passengers.");
         }
 
         return new ElevatorRequest(fromFloor, toFloor, passengers);
+    }
+    
+    private static void DisplayRequestMessage(string firstPart, string highlightedPart, string lastPart)
+    {
+        Console.Write(firstPart);
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.Write(highlightedPart);
+        Console.ResetColor();
+        Console.Write(lastPart);
     }
 }
