@@ -1,9 +1,23 @@
 using Elevator.Challenge.Domain.Enums;
+using Elevator.Challenge.Domain.Errors;
+using Elevator.Challenge.Domain.Shared;
 
 namespace Elevator.Challenge.Domain.Entities;
 
-public class PassengerElevator(int id, int maxPassengers) : ElevatorBase(id, maxPassengers)
+/// <summary>
+/// Represents a passenger elevator with specific functionality for moving, adding, and removing passengers.
+/// </summary>
+public class PassengerElevator : ElevatorBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PassengerElevator"/> class.
+    /// </summary>
+    /// <param name="id">The unique identifier of the elevator.</param>
+    /// <param name="maxPassengers">The maximum number of passengers the elevator can hold.</param>
+    public PassengerElevator(int id, int maxPassengers) : base(id, maxPassengers)
+    {
+    }
+
     public override async Task MoveAsync(bool simulateMovement, CancellationToken cancellationToken)
     {
         try
@@ -12,16 +26,19 @@ public class PassengerElevator(int id, int maxPassengers) : ElevatorBase(id, max
             {
                 return;
             }
-        
-            Status = Status.Moving;
-            var nextFloor = DestinationFloors[0];
-            CurrentDirection = nextFloor > CurrentFloor ? Direction.Up : Direction.Down;
 
+            var nextFloor = DestinationFloors[0];
+
+            CurrentDirection = nextFloor > CurrentFloor ? Direction.Up : Direction.Down;
+            Status = Status.Moving;
+
+            // Simulate movement by delaying the task
             if (simulateMovement)
             {
                 await Task.Delay(Math.Abs(nextFloor - CurrentFloor) * 1000, cancellationToken);
             }
-        
+
+            // Check if the operation has been canceled
             cancellationToken.ThrowIfCancellationRequested();
 
             CurrentFloor = nextFloor;
@@ -35,6 +52,7 @@ public class PassengerElevator(int id, int maxPassengers) : ElevatorBase(id, max
         }
         catch (OperationCanceledException)
         {
+            // Handle operation cancellation
             Status = Status.Available;
             CurrentDirection = Direction.Idle;
         }
@@ -50,24 +68,28 @@ public class PassengerElevator(int id, int maxPassengers) : ElevatorBase(id, max
         return CurrentPassengers + count <= MaxPassengers;
     }
 
-    public override void AddPassengers(int count)
+    public override Result AddPassengers(int count)
     {
         if (!CanAddPassengers(count))
         {
-            throw new InvalidOperationException("Elevator capacity exceeded");
+            return Result.Failure(DomainErrors.Elevator.MaxPassengersExceeded);
         }
 
         CurrentPassengers += count;
+
+        return Result.Success();
     }
 
-    public override void RemovePassengers(int count)
+    public override Result RemovePassengers(int count)
     {
         if (CurrentPassengers - count < 0)
         {
-            throw new InvalidOperationException("Cannot remove more passengers than present");
+            return Result.Failure(DomainErrors.Elevator.RemovePassengers);
         }
 
         CurrentPassengers -= count;
+
+        return Result.Success();
     }
 
     public override void AddDestination(int floor)
@@ -76,7 +98,7 @@ public class PassengerElevator(int id, int maxPassengers) : ElevatorBase(id, max
         {
             return;
         }
-        
+
         DestinationFloors.Add(floor);
         DestinationFloors.Sort();
     }

@@ -6,7 +6,12 @@ namespace Elevator.Challenge.Presentation.Services;
 
 public static class ConsoleDisplayService
 {
-    public static void ShowMessage(string message, ConsoleColor consoleColor)
+    /// <summary>
+    /// Displays a message in the specified console color.
+    /// </summary>
+    /// <param name="message">The message to display.</param>
+    /// <param name="consoleColor">The color to use for the message.</param>
+    public static void DisplayMessage(string message, ConsoleColor consoleColor)
     {
         Console.ForegroundColor = consoleColor;
         Console.WriteLine();
@@ -15,7 +20,11 @@ public static class ConsoleDisplayService
         Console.ResetColor();
     }
 
-    public static void ShowStatus(IEnumerable<ElevatorBase> elevators)
+    /// <summary>
+    /// Displays the status of all elevators.
+    /// </summary>
+    /// <param name="elevators">The list of elevators to display the status for.</param>
+    public static void DisplayStatus(IEnumerable<ElevatorBase> elevators)
     {
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.White;
@@ -50,29 +59,54 @@ public static class ConsoleDisplayService
         }
     }
 
-    public static ElevatorRequest GetRequest()
+    /// <summary>
+    /// Gets an elevator request from user input.
+    /// </summary>
+    /// <returns>An ElevatorRequest object containing the user's input.</returns>
+    public static ElevatorRequest GetElevatorRequestFromUserInput()
     {
-        Console.Write("Enter the floor number where the elevator is called from: ");
-
-        if (!int.TryParse(Console.ReadLine(), out var fromFloor))
+        int fromFloor;
+        while (true)
         {
-            Console.WriteLine("Please enter a valid floor number");
+            DisplayRequestMessage("Enter the floor number where the elevator is called ", "from", ": ");
+            if (int.TryParse(Console.ReadLine(), out fromFloor))
+            {
+                break;
+            }
+            Console.WriteLine("Please enter a valid floor number.");
         }
 
-        Console.Write("Enter the floor number where the elevator should go to: ");
-
-        if (!int.TryParse(Console.ReadLine(), out var toFloor))
+        int toFloor;
+        while (true)
         {
-            Console.WriteLine("Please enter a valid floor number");
+            DisplayRequestMessage("Enter the floor number where the elevator should go ", "to", ": ");
+            if (int.TryParse(Console.ReadLine(), out toFloor))
+            {
+                break;
+            }
+            Console.WriteLine("Please enter a valid floor number.");
         }
 
-        Console.Write("Enter the number of passengers on the elevator: ");
-
-        if (!int.TryParse(Console.ReadLine(), out var passengers))
+        int passengers;
+        while (true)
         {
-            Console.WriteLine("Please enter a valid floor number");
+            DisplayRequestMessage("Enter the number of", " passengers ", "on the elevator: ");
+            if (int.TryParse(Console.ReadLine(), out passengers))
+            {
+                break;
+            }
+            Console.WriteLine("Please enter a valid number of passengers.");
         }
 
         return new ElevatorRequest(fromFloor, toFloor, passengers);
+    }
+    
+    private static void DisplayRequestMessage(string firstPart, string highlightedPart, string lastPart)
+    {
+        Console.Write(firstPart);
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.Write(highlightedPart);
+        Console.ResetColor();
+        Console.Write(lastPart);
     }
 }
