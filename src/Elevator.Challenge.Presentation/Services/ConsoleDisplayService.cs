@@ -53,7 +53,8 @@ public static class ConsoleDisplayService
     /// number of passengers, and destination floors.
     /// </summary>
     /// <param name="elevators">The collection of elevators to display the status for.</param>
-    public static void DisplayStatus(IEnumerable<ElevatorBase> elevators)
+    /// <param name="addProgress">Indicates whether to add progress information to the display.</param>
+    public static void DisplayStatus(IEnumerable<ElevatorBase> elevators, bool addProgress = false)
     {
         Console.SetCursorPosition(0, 0);
         ConsoleExtensions.WritePadded("Welcome to the Elevator Simulation System");
@@ -64,15 +65,15 @@ public static class ConsoleDisplayService
         ConsoleExtensions.WritePadded("=== Elevator Status ===");
         
         // Start the iteration height at 2 because of the welcome message and status message
-        var iterationHeightStart = 2;
+        var iterationHeight = 2;
         
         foreach (var elevator in elevators)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.SetCursorPosition(0, iterationHeightStart + 1);
+            Console.SetCursorPosition(0, iterationHeight + 1);
             ConsoleExtensions.WritePadded($"Elevator #{elevator.Id}");
             Console.ResetColor();
-            Console.SetCursorPosition(0, iterationHeightStart + 2);
+            Console.SetCursorPosition(0, iterationHeight + 2);
             ConsoleExtensions.WritePadded($"Current Floor: {elevator.CurrentFloor}");
             Console.ForegroundColor = elevator.Status switch
             {
@@ -81,7 +82,7 @@ public static class ConsoleDisplayService
                 Status.Stopped => ConsoleColor.Yellow,
                 _ => ConsoleColor.Red
             };
-            Console.SetCursorPosition(0, iterationHeightStart + 3);
+            Console.SetCursorPosition(0, iterationHeight + 3);
             ConsoleExtensions.WritePadded($"Status: {elevator.Status}");
             Console.ResetColor();
             Console.ForegroundColor = elevator.CurrentDirection switch
@@ -91,18 +92,33 @@ public static class ConsoleDisplayService
                 Direction.Idle => ConsoleColor.White,
                 _ => ConsoleColor.Red
             };
-            Console.SetCursorPosition(0, iterationHeightStart + 4);
+            Console.SetCursorPosition(0, iterationHeight + 4);
             ConsoleExtensions.WritePadded($"Direction: {elevator.CurrentDirection}");
             Console.ResetColor();
-            Console.SetCursorPosition(0, iterationHeightStart + 5);
+            Console.SetCursorPosition(0, iterationHeight + 5);
             ConsoleExtensions.WritePadded($"Passengers: {elevator.CurrentPassengers}/{elevator.MaxPassengers}");
-            Console.SetCursorPosition(0, iterationHeightStart + 6);
+            Console.SetCursorPosition(0, iterationHeight + 6);
             ConsoleExtensions.WritePadded($"Destinations: {string.Join(", ", elevator.DestinationFloors)}");
-            Console.SetCursorPosition(0, iterationHeightStart + 7);
+            Console.SetCursorPosition(0, iterationHeight + 7);
             ConsoleExtensions.WritePadded("===========================");
 
-            iterationHeightStart += 7;
+            iterationHeight += 7;
         }
+
+        Console.SetCursorPosition(0, iterationHeight + 1);
+        
+        if (addProgress)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            ConsoleExtensions.WritePadded("Working...");
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            ConsoleExtensions.WritePadded("Waiting for input...");
+        }
+
+        Console.ResetColor();
     }
 
     
@@ -116,7 +132,7 @@ public static class ConsoleDisplayService
         int fromFloor;
         while (true)
         {
-            Console.SetCursorPosition(0, statusHeight + 1);
+            Console.SetCursorPosition(0, statusHeight + 2);
             DisplayRequestMessage("Enter the floor number where the elevator is called ", "from", ": ");
             if (int.TryParse(Console.ReadLine(), out fromFloor))
             {
@@ -128,7 +144,7 @@ public static class ConsoleDisplayService
         int toFloor;
         while (true)
         {
-            Console.SetCursorPosition(0, statusHeight + 2);
+            Console.SetCursorPosition(0, statusHeight + 3);
             DisplayRequestMessage("Enter the floor number where the elevator should go ", "to", ": ");
             if (int.TryParse(Console.ReadLine(), out toFloor))
             {
@@ -140,7 +156,7 @@ public static class ConsoleDisplayService
         int passengers;
         while (true)
         {
-            Console.SetCursorPosition(0, statusHeight + 3);
+            Console.SetCursorPosition(0, statusHeight + 4);
             DisplayRequestMessage("Enter the number of", " passengers ", "on the elevator: ");
             if (int.TryParse(Console.ReadLine(), out passengers))
             {

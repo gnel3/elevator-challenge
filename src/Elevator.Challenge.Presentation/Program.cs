@@ -1,11 +1,8 @@
 ﻿using Elevator.Challenge.Application;
 using Elevator.Challenge.Application.Interfaces;
-using Elevator.Challenge.Presentation.Extensions;
 using Elevator.Challenge.Presentation.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-IElevatorService elevatorService;
 
 try
 {
@@ -22,10 +19,12 @@ try
         .BuildServiceProvider();
 
     // Get the elevator service from the service provider
-    elevatorService = serviceProvider.GetRequiredService<IElevatorService>();
+    var elevatorService = serviceProvider.GetRequiredService<IElevatorService>();
 
     // Create a cancellation token source to handle graceful shutdowns
     using var cancellationTokenSource = new CancellationTokenSource();
+    
+    var cancellationToken = cancellationTokenSource.Token;
 
     // Handle Ctrl+C to cancel the simulation
     Console.CancelKeyPress += (_, e) =>
@@ -51,66 +50,33 @@ try
 
     // Display initial status of elevators
     ConsoleDisplayService.DisplayStatus(elevatorService.Elevators);
-
-    // Main loop to handle elevator requests
-    while (!cancellationTokenSource.Token.IsCancellationRequested)
+    
+    // Main task to handle elevator requests so that using CancelKeyPress works to cancel the task
+    var mainTask = Task.Run(async () =>
     {
-        try
+        while (!cancellationToken.IsCancellationRequested)
         {
             var elevatorRequestFromUserInput = ConsoleDisplayService.GetElevatorRequestFromUserInput(statusHeight);
 
-            Console.Clear();
-
-            var callElevatorTask = Task.Run(async () =>
-            {
-                var elevatorResult =
-                    await elevatorService.CallElevatorAsync(elevatorRequestFromUserInput, cancellationTokenSource.Token);
-
-                if (!elevatorResult.IsFailure)
-                {
-                    return elevatorResult;
-                }
-                
-                Console.SetCursorPosition(0, statusHeight + 1);
-                ConsoleExtensions.WritePadded(elevatorResult.Error.Message);
-
-                return elevatorResult;
-            }, cancellationTokenSource.Token);
-
-            var statusUpdateTask = Task.Run(async () =>
-            {
-                while (!callElevatorTask.IsCompleted)
-                {
-                    ConsoleDisplayService.DisplayStatus(elevatorService.Elevators);
-                    await Task.Delay(500);
-                }
-            }, cancellationTokenSource.Token);
-
-            await statusUpdateTask;
-
-            var result = await callElevatorTask;
-            if (result.IsSuccess)
+            var elevatorRequestTask = Task.Run(async () => await ElevatorRequestService.HandleElevatorRequest(
+                elevatorService,
+                elevatorRequestFromUserInput,
+                cancellationToken), cancellationToken);
+            
+            var elevatorRequestResult = await elevatorRequestTask;
+            if (elevatorRequestResult.IsSuccess)
             {
                 ConsoleDisplayService.DisplayStatus(elevatorService.Elevators);
-                ConsoleDisplayService.DisplayMessage("Press 'Q' to quit or any other key to make another request.",
-                    ConsoleColor.Yellow, statusHeight);
+                continue;
+            }
 
-                if (Console.ReadKey().Key == ConsoleKey.Q)
-                {
-                    cancellationTokenSource.Cancel();
-                    break;
-                }
-            }
-            else
-            {
-                ConsoleDisplayService.DisplayMessage(result.Error.Message, ConsoleColor.Red, statusHeight);
-            }
+            ConsoleDisplayService.DisplayMessage(elevatorRequestResult.Error.Message, ConsoleColor.Red,
+                statusHeight + 1);
         }
-        catch (Exception ex)
-        {
-            ConsoleDisplayService.DisplayMessage(ex.Message, ConsoleColor.Red, statusHeight);
-        }
-    }
+    }, cancellationToken);
+
+    // Wait for the main task to complete or for the cancellation token to be triggered
+    await Task.WhenAny(mainTask, Task.Delay(Timeout.Infinite, cancellationToken));
 }
 catch (Exception ex)
 {
